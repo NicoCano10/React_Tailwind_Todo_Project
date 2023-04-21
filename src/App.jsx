@@ -1,55 +1,85 @@
-import CrossIcon from "./components/icons/CrossIcon"
-import MoonIcon from "./components/icons/MoonIcon"
+import TodoComputed from "./components/TodoComputed"
+import TodoCreate from "./components/TodoCreate"
+import TodoFilter from "./components/TodoFilter"
+import TodoList from "./components/TodoList"
+import Header from "./components/Header"
+import { useState } from "react"
+
+const initialStateTodos = [
+
+    {id: 1, title: "Go to Play Soccer", Completed: true,},
+    {id: 2, title: "Continuar Demon Slayer", Completed: false,},
+    {id: 3, title: "Regresar a mi Hermosa Tierra", Completed: false,},
+    {id: 4, title: "Ver una Peli con Isa", Completed: false,},
+    {id: 5, title: "Empezarme The Last Of Us sin que me de Miedo 😅", Completed: false}
+
+]
+
 
 const App = () => { 
-  return <div className="bg-[url('./assets/images/bg-mobile-light.jpg')] bg-no-repeat bg-cover bg-center bg-gray-300 min-h-screen">
-    <header className="container mx-auto px-4 pt-8">
-      <div className="flex justify-between">
-      <h1 className="uppercase text-white text-3xl font-semibold tracking-[0.5em]">TODO</h1>
-      <button><MoonIcon/></button>
-      </div>
-      <form className="bg-white overflow-hidden rounded-md py-2 flex gap-4 items-center px-4 mt-10">
-        <span className="rounded-full border-2 w-5 h-5 inline-block"></span>
-        <input className="w-full text-gray-400 outline-none shadow-md shadow-red-500" type="text" placeholder="Create a new Todo..."/>
-      </form>
-    </header>
 
-    <main className="container mx-auto px-4 mt-8 bg-white rounded-md py-2">
-      <div className="bg-white rounded-md [&>article]:p-4">
-      <article className="flex gap-4 border-b-gray-500 border-b">
-        <button className="rounded-full border-2 w-5 h-5 inline-block flex-none"></button>
-        <p className="text-gray-600 grow">Complete Online JavaScript Curse in bluuweb</p>
-        <button className="flex-none"><CrossIcon/></button>
-      </article>
+  const [todos,setTodos] = useState(initialStateTodos)
 
-      <article className="flex gap-4 border-b-gray-500 border-b">
-        <button className="rounded-full border-2 w-5 h-5 inline-block flex-none"></button>
-        <p className="text-gray-600 grow">Complete Online JavaScript Curse in bluuweb</p>
-        <button className="flex-none"><CrossIcon/></button>
-      </article>
+  const createTodo = (title) => {
+    const newTodo = {
+      id: Date.now(),
+      title,
+      Completed: false
+    }
 
-      <article className="flex gap-4 border-b-gray-500 border-b">
-        <button className="rounded-full border-2 w-5 h-5 inline-block flex-none"></button>
-        <p className="text-gray-600 grow">Complete Online JavaScript Curse in bluuweb</p>
-        <button className="flex-none"><CrossIcon/></button>
-      </article>
+    setTodos ([...setTodos, newTodo])
 
-      <section className="px-4 py-4 flex justify-between">
-        <span className="text-gray-400">5 items left</span>
-        <button className="text-gray-400">Clear Completed</button>
-      </section>
-      </div>
+  }
+
+  const removeTodo = (id) => {
+    setTodos(todos.filter((todo) => todo.id !== id));
+  }
+
+  const updateTodo = (id) => {
+    setTodos(todos.map(
+      todo => todo.id === id ? {...todo, Completed: !todo.Completed} : todo))
+  }
+
+  const computedItemsLeft = todos.filter((todo) => !todo.Completed).length;
+
+  const clearCompleted = () => {
+    setTodos(todos.filter((todo) => !todo.Completed));
+  }
+
+  const [filter, setFilter] = useState("All")
+
+  const changeFilter = (filter) => setFilter(filter)
+
+  const filteredTodos = () => {
+    switch (filter) {
+      case "All":
+        return todos;
+      case "Active":
+        return todos.filter((todo) => !todo.Completed);
+      case "Completed":
+        return todos.filter((todo) =>todo.Completed);
+      default:
+        return todos;
+    }
+  }
+
+  return <div className="bg-[url('./assets/images/bg-mobile-light.jpg')] bg-no-repeat bg-cover bg-center bg-gray-300 min-h-screen dark:bg-[url('./assets/images/bg-mobile-dark.jpg')] transition-all duration-1000">
+      <Header/>
+
+
+    <main className="container mx-auto mt-8 px-4">
+      
+      <TodoCreate createTodo={createTodo}/>
+
+      <TodoList todos={filteredTodos()} removeTodo={removeTodo} updateTodo={updateTodo}/>
+
+      <TodoComputed computedItemsLeft={computedItemsLeft} clearCompleted={clearCompleted}/>
+
+      <TodoFilter changeFilter={changeFilter} filter={filter}/>
+
     </main>
 
-    <section className="container mx-auto px-4 mt-8">
-      <div className="bg-white p-4 rounded-md flex justify-center gap-4">
-      <button className="text-blue-600">All</button>
-      <button className="hover:text-blue-600">Active</button>
-      <button className="hover:text-blue-600">Completed</button>
-      </div>
-    </section>
-
-    <p className="text-center mt-8">Drag and drop to reorder list</p>
+    <footer className="text-center mt-8 dark:text-white">Drag and drop to reorder list</footer>
 
   </div>
 }
