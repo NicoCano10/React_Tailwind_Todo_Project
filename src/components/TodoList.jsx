@@ -1,15 +1,44 @@
+import { Droppable, Draggable } from "@hello-pangea/dnd";
 import TodoItem from "./TodoItem"
 
-const TodoList = ({todos, removeTodo, updateTodo}) => { 
+const TodoList = ({ todos, removeTodo, updateTodo }) => {
+    console.log(todos);
     return (
-        <div className="bg-white container rounded-t-md [&>article]:p-4 mt-8 mx-auto transition-all duration-1000">
+        <Droppable droppableId="todos">
+            {(droppableProvided) => (
+                <div ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}
+                    className="bg-white container rounded-t-md [&>article]:p-4 mt-8 mx-auto transition-all duration-1000">
 
-        {todos.map((todo) => (
-            <TodoItem key={todo.id} todo={todo} removeTodo={removeTodo} updateTodo={updateTodo}/>
-        ))}
+                    {todos.map((todo, index) => (
 
-        </div>
+                        <Draggable 
+                        key={todo.id} 
+                        index={index} 
+                        draggableId={`${todo.id}`}
+                        >
+                            {(draggableProvided) => (
+                                <TodoItem
+
+                                    todo={todo}
+                                    removeTodo={removeTodo}
+                                    updateTodo={updateTodo} 
+                                    ref={draggableProvided.innerRef}
+                                    {...draggableProvided.dragHandleProps}
+                                    {...draggableProvided.draggableProps}
+
+                                    />
+                            )}
+
+                        </Draggable>
+
+
+                    ))}
+                    {droppableProvided.placeholder}
+                </div>
+            )
+            }
+        </Droppable>
     )
- }
+}
 
 export default TodoList
